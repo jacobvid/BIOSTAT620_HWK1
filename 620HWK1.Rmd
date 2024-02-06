@@ -1,0 +1,199 @@
+---
+title: "BIOSTAT 620 HWK 1 Jacob Vidergar"
+output: pdf_document
+date: "2024-02-05"
+---
+
+Import Packages:
+```{r}
+install.packages("readxl")
+install.packages("writexl")
+install.packages("circular")
+
+library(readxl)
+library(circular)
+
+screenData <- read_excel("BIOSTAT 620 Data (Through Jan 26).xlsx")
+
+```
+Problem 1:
+
+  a. The purpose of this study is to investigate a potential change in behavior relating to total screen time when an intervention is introduced with the purpose of reducing daily screen usage. A hypothesis I would like to investigate is turning my phone on grayscale (black and white mode) to see if this reduces screen time. I've found various articles that claim there may be a significant relationship between grayscale and screen time, such as this: https://www.researchgate.net/publication/340421051_True_colors_Grayscale_setting_reduces_screen_time_in_college_students#:~:text=In%20a%20replication%20of%20this,to%20engage%20with%20the%20device.
+
+  b. The informed consent form is used to inform study participants of the possible risks of participating in a study. It gives an overview of how the study will be conducted and how the people conducting it are attempting to minimize potential risks to the participants. It also ensures that study participants are of aware of how their data will be collected and used, and it allows us to get legal permission as researchers to use this data.
+
+  c.
+  When data is collected: 
+    The data for each day is collected the following morning (in order to ensure that the entire day’s data is accurate and complete)
+    
+   Types of variables:
+    Total screen time, total screen time (minutes), total social media time, total social media time (minutes), number of pickups, time of first pickup
+    
+  Where data is collected from:
+    The data is collected from each study participants personal cell phone using the built in screen time data collection tool in the phone’s settings
+    
+  How much data before freeze:
+    There is a total of 34 rows of data before the freeze on January 26th
+
+d. New variables were added using excel:
+```{r}
+# Display New Variables
+screenData$Daily.Proportion.ST
+screenData$Daily.Duration.Per.Use
+```
+
+Problem 2a:
+```{r}
+# Create time series plots
+
+# Total.ST.min
+screenData$Date <- as.Date(screenData$Date, format="%m-%d-%y")
+tsTotalSt <- ts(screenData$Total.ST.min, start = min(screenData$Date), frequency = 1)
+
+plot(tsTotalSt, main = "Time Series: Total Screen Time", xlab = "Date", ylab = "Total Screen Time", xaxt = "n")
+# xaxt = "n" and the following line are to reformat x axis and make sure dates appear properly
+axis(1, at = time(tsTotalSt), labels = format(screenData$Date, "%m-%d-%y"))
+
+# Social.ST.min
+tsSocialSt <- ts(screenData$Social.ST.min, start = min(screenData$Date), frequency = 1)
+
+plot(tsSocialSt, main = "Time Series: Social Screen Time", xlab = "Date", ylab = "Social Screen Time", xaxt = "n")
+axis(1, at = time(tsSocialSt), labels = format(screenData$Date, "%m-%d-%y"))
+
+# Pickups
+tsPickups <- ts(screenData$Pickups, start = min(screenData$Date), frequency = 1)
+
+plot(tsPickups, main = "Time Series: Pickups", xlab = "Date", ylab = "Pickups", xaxt = "n")
+axis(1, at = time(tsPickups), labels = format(screenData$Date, "%m-%d-%y"))
+
+# Daily.Proportion.ST
+tsDailyProportionSt <- ts(screenData$Daily.Proportion.ST, start = min(screenData$Date), frequency = 1)
+
+plot(tsDailyProportionSt, main = "Time Series: Daily Proportion of Screen Time", xlab = "Date", ylab = "Daily Proportion of Screen Time", xaxt = "n")
+axis(1, at = time(tsDailyProportionSt), labels = format(screenData$Date, "%m-%d-%y"))
+
+# Daily.Duration.Per.Use
+tsDailyDurationPerUse <- ts(screenData$Daily.Duration.Per.Use, start = min(screenData$Date), frequency = 1)
+
+plot(tsDailyDurationPerUse, main = "Time Series: Daily Duration Per Use", xlab = "Date", ylab = "Daily Duration Per Use", xaxt = "n")
+axis(1, at = time(tsDailyDurationPerUse), labels = format(screenData$Date, "%m-%d-%y"))
+
+```
+Temporal Patterns (Problem 2a continued): One thing I noticed from looking at these plots is that the days where my screen time peaked I seemed to have less pickups than normal. I also noticed that the duration per use increased during this time (which makes sense as this is directly correlated to an increase in screen time with a decrease in number of pickups). My screen time (both total and social) seems to have peaked around January 5-9. This was right before the second semester began, which may have had an effect on how much screen time I was getting.
+
+Problem 2b:
+```{r}
+# Pairwise Scatter plots
+pairs(screenData[c("Total.ST.min", "Social.ST.min", "Pickups", "Daily.Proportion.ST", "Daily.Duration.Per.Use")],
+      main = "Pairwise Scatterplots")
+```
+Correlation Patterns (Problem 2b continued): There is a direct relationship between the total amount of screen time and the daily duration per use (as one increases, so does the other). These variables have the highest correlation. There seems to be a direct relationship between total screen time and social screen time as well. There is an inverse relationship between daily duration per use and number of pickups. This makes sense as number of pickups is the denominator in the calculation for daily duration per use.
+
+Problem 2c:
+```{r}
+# Occupational Time Curves
+
+# Total.ST.Min
+occupation_time <- cumsum(tsTotalSt)
+plot(screenData$Date, occupation_time, type = "l",
+     xlab = "Date", ylab = "Time",
+     main = "Occupation Time Curve: Total Screen Time")
+
+# Social.ST.Min
+occupation_time <- cumsum(tsSocialSt)
+plot(screenData$Date, occupation_time, type = "l",
+     xlab = "Date", ylab = "Time",
+     main = "Occupation Time Curve: Social Screen Time")
+
+# Pickups
+occupation_time <- cumsum(tsPickups)
+plot(screenData$Date, occupation_time, type = "l",
+     xlab = "Date", ylab = "Time",
+     main = "Occupation Time Curve: Pickups")
+
+# Daily.Proportion.ST
+occupation_time <- cumsum(tsDailyProportionSt)
+plot(screenData$Date, occupation_time, type = "l",
+     xlab = "Date", ylab = "Time",
+     main = "Occupation Time Curve: Daily Proportion Screen Time")
+
+# Daily.Duration.Per.Use
+occupation_time <- cumsum(tsDailyDurationPerUse)
+plot(screenData$Date, occupation_time, type = "l",
+     xlab = "Date", ylab = "Time",
+     main = "Occupation Time Curve: Daily Duration Per Use")
+```
+Problem 2c continued: Each curve is steadily increasing, and there are very few sharp increases or plateaus in any of the graphs. This indicates that my day to day phone usage was relatively consistent throughout the duration of the study so far.
+
+Problem 2d:
+```{r}
+acf(tsTotalSt, plot = FALSE)
+acf(tsSocialSt, plot = FALSE)
+acf(tsPickups, plot = FALSE)
+acf(tsDailyProportionSt, plot = FALSE)
+acf(tsDailyDurationPerUse, plot = FALSE)
+```
+Problem 2d continued: In most cases, it seems as though the autocorrelation is strongest when lag time is lower. In the case of daily duration per use, however, the autocorrelation is very similar (in terms of magnitude) with a lag time between 1 and 2 and between 13 and 15.
+
+Problem 3a and 3b:
+```{r}
+# 3a
+circularPickups <- circular::circular(as.numeric(screenData$Pickups.1st) * 360 / 86400, type = "angles", units = "degrees")
+
+# 3b
+plot.circular(circularPickups, main = "Circular Scatterplot for Pickup Time", rotation = "clock", zero = pi / 2)
+
+```
+Problem 3b continued: Most of my first pickups were around midnight or just after. Occasionally, I was able to make it to late morning without looking at my phone.
+
+Problem 3c:
+```{r}
+rose.diag(circularPickups, bins = 24, main = "Circular Histogram", rotation = "clock", zero = pi / 2)
+```
+Problem 3c continued: I chose a bin size of 15 (a total of 24 bins) because this corresponds to a time period of one hour. I chose this because it enhances the readability of the histogram while still encapsulating the necessary information.
+
+Problem 4a:
+The factor St is needed because, when multiplied by the hourly pickup rate (lambda), it yields the total number of pickups for that day.
+
+Problem 4b:
+```{r}
+model <- glm(screenData$Pickups ~ offset(log(screenData$Total.ST.min / 60)), family = poisson)
+summary(model)
+```
+
+Problem 4c:
+```{r}
+# Dummy variables
+screenData$Xt <- ifelse(weekdays(screenData$Date) %in% c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), 1, 0)
+screenData$Zt <- ifelse(screenData$Date >= as.Date("2024-01-10"), 1, 0)
+
+# Log-Linear Model
+lnModel <- glm(screenData$Pickups ~ offset(log(screenData$Total.ST.min / 60)) + screenData$Xt + screenData$Zt, family = poisson)
+summary(lnModel)
+```
+Problem 4c continued:
+c.1: It can be seen from the model summary that the p-value for the Xt column (the dummy variable for weekdays vs weekends) is much smaller than 0.05. This indicates a significant relationship between the daily number of pickups and whether it is a weekday or weekend.
+
+c.2: The p-value for the Zt column (the dummy variable indicating if a date is before or after the beginning of the winter semester) is also much smaller than 0.05. This indicates a significant relationship between the daily number of pickups and whether or not the winter semester has begun.
+
+Problem 5a:
+```{r}
+mle <- circular::mle.vonmises(circularPickups)
+
+# value of mu
+print(mle$mu)
+
+# value of lambda, called kappa in this function according to rdocumentation.org
+print(mle$kappa)
+```
+Problem 5a continued: mu = 20.54244, lambda = 2.984244
+
+Problem 5b:
+```{r}
+# Calculate probability that first pick up is after 8:30 AM
+# 8.5 * 360 / 86400 converts time to degrees
+print(1 - circular::pvonmises(circular::circular(8.5 * 2 * pi / 24), mu = mle$mu, kappa = mle$kappa))
+```
+The probability of my first pick up being after 8:30 AM, based on the data collected, is 0.2994187
+
+
