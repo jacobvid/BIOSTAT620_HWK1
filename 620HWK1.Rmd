@@ -4,11 +4,13 @@ output: pdf_document
 date: "2024-02-05"
 ---
 
+Github Link: https://github.com/jacobvid/BIOSTAT620_HWK1
+
 Import Packages:
 ```{r}
-install.packages("readxl")
-install.packages("writexl")
-install.packages("circular")
+#install.packages("readxl")
+#install.packages("writexl")
+#install.packages("circular")
 
 library(readxl)
 library(circular)
@@ -194,6 +196,6 @@ Problem 5b:
 # 8.5 * 360 / 86400 converts time to degrees
 print(1 - circular::pvonmises(circular::circular(8.5 * 2 * pi / 24), mu = mle$mu, kappa = mle$kappa))
 ```
-The probability of my first pick up being after 8:30 AM, based on the data collected, is 0.2994187
+The probability of my first pick up being after 8:30 AM, based on the data collected, is 0.00559976
 
 
