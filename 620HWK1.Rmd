@@ -193,7 +193,7 @@ Problem 5a continued: mu = 20.54244, lambda = 2.984244
 Problem 5b:
 ```{r}
 # Calculate probability that first pick up is after 8:30 AM
-# 8.5 * 360 / 86400 converts time to degrees
+# 8.5 * 2 * pi / 24 converts time to radians
 print(1 - circular::pvonmises(circular::circular(8.5 * 2 * pi / 24), mu = mle$mu, kappa = mle$kappa))
 ```
 The probability of my first pick up being after 8:30 AM, based on the data collected, is 0.00559976
